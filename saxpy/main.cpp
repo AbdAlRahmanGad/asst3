@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string>
-
+#include <cuda_runtime.h>
 void saxpyCuda(int N, float alpha, float* x, float* y, float* result);
 void printCudaInfo();
 
@@ -44,9 +44,12 @@ int main(int argc, char** argv)
     // end parsing of commandline options //////////////////////////////////////
 
     const float alpha = 2.0f;
-    float* xarray = new float[N];
-    float* yarray = new float[N];
+    float* xarray;
+    float* yarray;
     float* resultarray = new float[N];
+
+    cudaHostAlloc((void**)&xarray, N*sizeof(float), cudaHostAllocDefault);
+    cudaHostAlloc((void**)&yarray, N*sizeof(float), cudaHostAllocDefault);
 
     for (int i=0; i<N; i++) {
         xarray[i] = yarray[i] = i % 10;
@@ -60,8 +63,9 @@ int main(int argc, char** argv)
       saxpyCuda(N, alpha, xarray, yarray, resultarray);
     }
 
-    delete [] xarray;
-    delete [] yarray;
+    cudaFreeHost(xarray);
+    cudaFreeHost(yarray);
+
     delete [] resultarray;
 
     return 0;

@@ -56,12 +56,16 @@ void cpu_exclusive_scan(int* start, int* end, int* output) {
     }
 
 #else    
+    double startTime = CycleTimer::currentSeconds();
+
     int N = end - start;
     output[0] = 0;
     for (int i = 1; i < N; i++) {
         output[i] = output[i-1] + start[i-1];
     }
+    double endTime = CycleTimer::currentSeconds();
 #endif
+printf("CPU scan time: %.3f ms\n", 1000.f * (endTime - startTime));
 }
 
 int cpu_find_repeats(int *start, int length, int *output) {
